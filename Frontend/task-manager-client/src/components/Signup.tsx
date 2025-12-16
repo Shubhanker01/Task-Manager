@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
 
 interface SignupProps {
     username: string;
@@ -8,6 +9,11 @@ interface SignupProps {
     confirmPassword: string;
 }
 export default function Signup() {
+    const { register, handleSubmit, formState: { errors } } = useForm<SignupProps>();
+
+    const onSubmit = (data: SignupProps) => {
+        console.log(data)
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
@@ -28,7 +34,7 @@ export default function Signup() {
                 </div>
 
                 {/* Form */}
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
                     {/* Username */}
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-1">
@@ -37,8 +43,12 @@ export default function Signup() {
                         <input
                             type="text"
                             placeholder="Your name"
+                            {...register("username", { required: true })}
                             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                         />
+                        {errors.username && <span className="text-red-500 text-sm mt-1">
+                            {errors.username.message || "Username is required."}
+                        </span>}
                     </div>
 
                     {/* Email */}
@@ -49,8 +59,12 @@ export default function Signup() {
                         <input
                             type="email"
                             placeholder="you@example.com"
+                            {...register("email", { required: true })}
                             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                         />
+                        {errors.email && <span className="text-red-500 text-sm mt-1">
+                            {errors.email.message || "Email is required."}
+                        </span>}
                     </div>
 
                     {/* Password */}
@@ -61,8 +75,12 @@ export default function Signup() {
                         <input
                             type="password"
                             placeholder="••••••••"
+                            {...register("password", { required: true })}
                             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                         />
+                        {errors.password && <span className="text-red-500 text-sm mt-1">
+                            {errors.password.message || "Password is required."}
+                        </span>}
                     </div>
 
                     {/* Confirm Password */}
@@ -73,8 +91,12 @@ export default function Signup() {
                         <input
                             type="password"
                             placeholder="••••••••"
+                            {...register("confirmPassword", { required: true })}
                             className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
                         />
+                        {errors.confirmPassword && <span className="text-red-500 text-sm mt-1">
+                            {errors.confirmPassword.message || "Confirm password field is required."}
+                        </span>}
                     </div>
 
                     {/* Submit */}
