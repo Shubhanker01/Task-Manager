@@ -1,15 +1,22 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import type { LoginInterface } from "../types/auth.types";
+import { useLogin } from "../hooks/useLogin";
 
-interface LoginProps {
-    email: string;
-    password: string;
-}
 function Login() {
-    const { register, handleSubmit, formState: { errors } } = useForm<LoginProps>();
-    const onSubmit = (data: LoginProps) => {
-        console.log(data)
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginInterface>();
+
+    const loginMutation = useLogin()
+    const onSubmit = (data: LoginInterface) => {
+        loginMutation.mutateAsync(data, {
+            onSuccess: (data) => {
+                console.log("Login response: ", data)
+            },
+            onError: (msg) => {
+                console.log("On Error", msg)
+            }
+        })
     }
 
     return (
