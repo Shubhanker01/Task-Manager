@@ -1,22 +1,35 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import type { LoginInterface } from "../types/auth.types";
 import { useLogin } from "../hooks/useLogin";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { loginSchema, type LoginFormData } from "../validation/auth.schema";
+import { pendingMessage, updateToast } from "../utils/toast.utils";
+import type { AxiosError } from "axios";
 
 function Login() {
-    const { register, handleSubmit, formState: { errors } } = useForm<LoginInterface>();
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema)
+    });
 
     const loginMutation = useLogin()
-    const onSubmit = (data: LoginInterface) => {
-        loginMutation.mutateAsync(data, {
-            onSuccess: (data) => {
-                console.log("Login response: ", data)
-            },
-            onError: (msg) => {
-                console.log("On Error", msg)
-            }
-        })
+    const onSubmit = async (data: LoginFormData) => {
+        const toast = pendingMessage()
+        try {
+            const response = await loginMutation.mutateAsync(data)
+            console.log("login response", response)
+            updateToast(toast, response.message, "success")
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            updateToast(
+                toast,
+                err.response?.data?.message || "Login failed",
+                "error"
+            );
+
+        }
+
+
     }
 
     return (

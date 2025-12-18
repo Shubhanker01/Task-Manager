@@ -1,18 +1,34 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { useRegister } from "../hooks/useSignup";
+import { useNavigate } from "react-router-dom";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { signupSchema, type SignupFormData } from "../validation/auth.schema";
+import { pendingMessage, updateToast } from "../utils/toast.utils";
+import type { AxiosError } from "axios";
 
-interface SignupProps {
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-}
 export default function Signup() {
-    const { register, handleSubmit, formState: { errors } } = useForm<SignupProps>();
+    const navigate = useNavigate()
+    const signUpMutation = useRegister()
 
-    const onSubmit = (data: SignupProps) => {
-        console.log(data)
+    const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
+        resolver: zodResolver(signupSchema)
+    });
+    const onSubmit = async (data: SignupFormData) => {
+        const toast = pendingMessage()
+        try {
+            const response = await signUpMutation.mutateAsync(data)
+            updateToast(toast, response.message, 'success')
+            navigate('/login')
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            updateToast(
+                toast,
+                err.response?.data?.message || "Login failed",
+                "error"
+            );
+        }
     }
 
     return (

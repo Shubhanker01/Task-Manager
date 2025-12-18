@@ -2,7 +2,8 @@
 export interface registerInput {
     username: string,
     email: string,
-    password: string
+    password: string,
+    confirmPassword: string
 }
 
 export interface LoginInterface {

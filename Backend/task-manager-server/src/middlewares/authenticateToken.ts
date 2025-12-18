@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import 'dotenv/config'
 import { Request, Response, NextFunction } from 'express'
+import { JwtPayloadUserDefined } from '../types/jwt'
 
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -17,7 +18,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
                 return res.status(403).json({ message: 'Invalid token' })
             }
             else {
-                req.user = user
+                req.user = user as JwtPayloadUserDefined
                 next()
             }
 
