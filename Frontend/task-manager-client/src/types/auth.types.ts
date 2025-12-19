@@ -13,7 +13,7 @@ export interface LoginInterface {
 
 // response payloads
 export interface AuthUser {
-    id: string;
+    userId: string;
     username: string;
     email: string;
 }

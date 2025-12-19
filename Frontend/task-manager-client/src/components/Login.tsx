@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { useLogin } from "../hooks/useLogin";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, type LoginFormData } from "../validation/auth.schema";
 import { pendingMessage, updateToast } from "../utils/toast.utils";
 import type { AxiosError } from "axios";
 
 function Login() {
+    const navigate = useNavigate()
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema)
     });
@@ -19,6 +21,7 @@ function Login() {
             const response = await loginMutation.mutateAsync(data)
             console.log("login response", response)
             updateToast(toast, response.message, "success")
+            navigate(`/main-dashboard/${response.user.userId}`)
         } catch (error) {
             const err = error as AxiosError<{ message: string }>;
             updateToast(

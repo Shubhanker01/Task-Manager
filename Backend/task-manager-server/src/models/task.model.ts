@@ -52,12 +52,12 @@ const taskSchema = new Schema<ITask>({
     },
     creatorId: {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: "users",
         required: true,
     },
     assignedTo: {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: "users",
         required: true
     }
 }, { timestamps: true })
