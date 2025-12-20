@@ -5,11 +5,10 @@ import { JwtPayloadUserDefined } from '../types/jwt'
 
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const authHeader = req.headers['authorization']
-        const token = authHeader && authHeader.split(' ')[1]
+        const token = req.cookies['token']
         if (token == null) return res.status(401).json({ message: 'Token missing' })
 
-        jwt.verify(token, process.env.JWT_SECRET_KEY as string, (err, user) => {
+        jwt.verify(token, process.env.JWT_SECRET_KEY as string, (err: any, user: any) => {
             if (err) {
                 console.log('JWT verification failed:', err.message)
                 if (err.name === 'TokenExpiredError') {

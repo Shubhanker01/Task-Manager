@@ -81,7 +81,7 @@ export const userLogin = async (req: Request, res: Response) => {
         }, process.env.JWT_SECRET_KEY as string, { expiresIn: '1d' })
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
+            secure: false,
             sameSite: "lax",
             maxAge: 24 * 60 * 60 * 1000,
         })
@@ -92,6 +92,28 @@ export const userLogin = async (req: Request, res: Response) => {
                 username: user.username,
                 email: user.email
             }
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+}
+
+export const showUsers = async (req: Request, res: Response) => {
+    try {
+        const creatorId = req.user?.userId;
+        if (!creatorId) {
+            return res.status(401).json({
+                message: "Unauthorized"
+            })
+        }
+        const users = await User.find({ _id: { $ne: creatorId } }).select("_id username email")
+        return res.status(200).json({
+            message: "Users fetched successfully",
+            count: users.length,
+            users
         })
     } catch (error) {
         console.log(error)

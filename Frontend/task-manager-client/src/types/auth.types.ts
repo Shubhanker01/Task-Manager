@@ -22,3 +22,13 @@ export interface AuthResponse {
     message: string;
     user: AuthUser;
 }
+
+export interface PopulateUsers {
+    message: string;
+    count: number;
+    users: {
+        _id: string;
+        username: string;
+        email: string;
+    }
+}

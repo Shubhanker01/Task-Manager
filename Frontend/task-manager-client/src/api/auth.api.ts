@@ -1,4 +1,4 @@
-import type { AuthResponse, LoginInterface, registerInput } from "../types/auth.types"
+import type { AuthResponse, LoginInterface, registerInput, PopulateUsers } from "../types/auth.types"
 import api from "./axios"
 
 // endpoint for login/registration
@@ -16,5 +16,12 @@ export const userLogin = async (data: LoginInterface) => {
         "api/v1/user/login",
         data
     )
+    return response.data
+}
+
+export const populateUsers = async () => {
+    const response = await api.get<PopulateUsers>("api/v1/user/populate/users", {
+        withCredentials: true,
+    })
     return response.data
 }

@@ -1,34 +1,20 @@
 import { useState } from "react";
-
-interface AddTaskFormData {
-    title: string;
-    description: string;
-    dueDate: string;
-    priority: "Low" | "Medium" | "High" | "Urgent";
-    status: "To Do" | "In Progress" | "Review" | "Completed";
-    assignedToId: string;
-}
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addTaskSchema, type AddTaskFormData } from "../validation/task.schema";
+import { useCreateTask } from "../hooks/useTasks";
 
 export default function AddTask() {
+    const createTaskMutation = useCreateTask()
     const [isOpen, setIsOpen] = useState(false);
-    const [formData, setFormData] = useState<AddTaskFormData>({
-        title: "",
-        description: "",
-        dueDate: "",
-        priority: "Medium",
-        status: "To Do",
-        assignedToId: "",
-    });
-
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<AddTaskFormData>({
+        resolver: zodResolver(addTaskSchema)
+    })
+    const onSubmit = async (formData: AddTaskFormData) => {
         console.log("Add Task Payload:", formData);
+        const response = await createTaskMutation.mutateAsync(formData)
+        console.log("Create Task Response:", response);
+        reset()
         setIsOpen(false);
     };
 
@@ -58,31 +44,39 @@ export default function AddTask() {
                         </div>
 
                         {/* Form */}
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             {/* Title */}
                             <div>
                                 <label className="text-sm text-slate-400">Title</label>
                                 <input
                                     type="text"
-                                    name="title"
                                     maxLength={100}
                                     required
-                                    value={formData.title}
-                                    onChange={handleChange}
+                                    {...register("title")}
+
                                     className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
+                                {errors.title && (
+                                    <p className="text-red-400 text-xs mt-1">
+                                        {errors.title.message}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Description */}
                             <div>
                                 <label className="text-sm text-slate-400">Description</label>
                                 <textarea
-                                    name="description"
                                     rows={3}
-                                    value={formData.description}
-                                    onChange={handleChange}
+                                    {...register("description")}
+
                                     className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
+                                {errors.description && (
+                                    <p className="text-red-400 text-xs mt-1">
+                                        {errors.description.message}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Due Date */}
@@ -90,12 +84,16 @@ export default function AddTask() {
                                 <label className="text-sm text-slate-400">Due Date</label>
                                 <input
                                     type="datetime-local"
-                                    name="dueDate"
                                     required
-                                    value={formData.dueDate}
-                                    onChange={handleChange}
+                                    {...register("dueDate")}
+
                                     className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2"
                                 />
+                                {errors.dueDate && (
+                                    <p className="text-red-400 text-xs mt-1">
+                                        {errors.dueDate.message}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Priority & Status */}
@@ -103,9 +101,7 @@ export default function AddTask() {
                                 <div>
                                     <label className="text-sm text-slate-400">Priority</label>
                                     <select
-                                        name="priority"
-                                        value={formData.priority}
-                                        onChange={handleChange}
+                                        {...register("priority")}
                                         className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2"
                                     >
                                         <option>Low</option>
@@ -117,9 +113,7 @@ export default function AddTask() {
                                 <div>
                                     <label className="text-sm text-slate-400">Status</label>
                                     <select
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleChange}
+                                        {...register("status")}
                                         className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2"
                                     >
                                         <option>To Do</option>
@@ -132,15 +126,18 @@ export default function AddTask() {
 
                             {/* Assigned To */}
                             <div>
-                                <label className="text-sm text-slate-400">Assign To (User ID)</label>
-                                <input
-                                    type="text"
-                                    name="assignedToId"
-                                    value={formData.assignedToId}
-                                    onChange={handleChange}
+                                <label className="text-sm text-slate-400">Assign To</label>
+                                <select
+                                    {...register("assignedTo")}
                                     className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2"
-                                />
+                                >
+                                    <option>User 1</option>
+                                    <option>User 2</option>
+                                    <option>User 3</option>
+                                    <option>User 4</option>
+                                </select>
                             </div>
+
 
                             {/* Actions */}
                             <div className="flex justify-end gap-3 pt-4">
@@ -152,10 +149,11 @@ export default function AddTask() {
                                     Cancel
                                 </button>
                                 <button
+                                    disabled={isSubmitting}
                                     type="submit"
                                     className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500"
                                 >
-                                    Create Task
+                                    {isSubmitting ? "Adding.." : "Add Task"}
                                 </button>
                             </div>
                         </form>

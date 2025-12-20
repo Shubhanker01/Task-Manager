@@ -1,7 +1,12 @@
 import TaskCard from "./Task";
 import AddTask from "./AddTask";
+import { useTasks } from "../hooks/useTasks";
 
 export default function MainDashboard() {
+
+    const { data: tasks } = useTasks();
+    console.log(tasks)
+
     return (
         <div className="min-h-screen bg-slate-900 text-slate-100">
             {/* Header */}
@@ -16,8 +21,11 @@ export default function MainDashboard() {
 
                 {/* Task Grid */}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Task Card */}
-                    <TaskCard title="Random title" description="random description" dueDate="12-12-2025" priority="Low" status="In Progress" creatorName="User1" assignedToName="User2" />
+                    {
+                        tasks && tasks.map((task) => {
+                            return <TaskCard key={task._id} title={task.title} description={task.description} dueDate={task.dueDate} priority={task.priority} status={task.status} creatorName={task.creatorId?.username} assignedToName={task.assignedTo?.username}></TaskCard>
+                        })
+                    }
 
                     {/* Empty State Example */}
                     <div className="border border-dashed border-slate-700 rounded-2xl p-4 flex items-center justify-center text-slate-500">
