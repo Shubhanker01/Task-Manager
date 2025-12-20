@@ -1,5 +1,5 @@
 // controller for user registration and login
-import { genSalt, hash, compare } from 'bcrypt-ts'
+import { genSalt, hash, compare } from 'bcryptjs'
 import { User } from '../models/user.model'
 import { Request, Response } from 'express'
 import "dotenv/config"
