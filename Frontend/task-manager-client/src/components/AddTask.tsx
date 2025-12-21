@@ -3,19 +3,37 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addTaskSchema, type AddTaskFormData } from "../validation/task.schema";
 import { useCreateTask } from "../hooks/useTasks";
+import { usePopulate } from "../hooks/usePopulate";
+import type { PopulateIndividualUser } from "../types/auth.types";
+import { pendingMessage, updateToast } from "../utils/toast.utils";
+import type { AxiosError } from "axios";
+import { socket } from "../socket";
 
 export default function AddTask() {
     const createTaskMutation = useCreateTask()
+    const populateUsersQuery = usePopulate()
     const [isOpen, setIsOpen] = useState(false);
     const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<AddTaskFormData>({
         resolver: zodResolver(addTaskSchema)
     })
     const onSubmit = async (formData: AddTaskFormData) => {
-        console.log("Add Task Payload:", formData);
-        const response = await createTaskMutation.mutateAsync(formData)
-        console.log("Create Task Response:", response);
-        reset()
-        setIsOpen(false);
+        const toast = pendingMessage()
+        try {
+            const response = await createTaskMutation.mutateAsync(formData)
+            console.log("Create Task Response:", response);
+            socket.emit("taskCreated", response.task.assignedTo);
+            updateToast(toast, response.message, "success")
+            reset()
+            setIsOpen(false);
+        } catch (error) {
+            const err = error as AxiosError<{ message: string }>;
+            updateToast(
+                toast,
+                err.response?.data?.message || "Adding task failed",
+                "error"
+            );
+        }
+
     };
 
     return (
@@ -131,10 +149,11 @@ export default function AddTask() {
                                     {...register("assignedTo")}
                                     className="w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2"
                                 >
-                                    <option>User 1</option>
-                                    <option>User 2</option>
-                                    <option>User 3</option>
-                                    <option>User 4</option>
+                                    {
+                                        populateUsersQuery.data?.users.map((user: PopulateIndividualUser) => (
+                                            <option key={user._id} value={user._id}>{user.username}</option>
+                                        ))
+                                    }
                                 </select>
                             </div>
 

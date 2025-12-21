@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Task } from '../types/task.types';
 import { getAllTasks, createTask } from "../api/task.api";
 import type { AddTaskFormData } from "../validation/task.schema";
@@ -13,7 +13,12 @@ export const useTasks = () => {
 }
 
 export const useCreateTask = () => {
+    const queryClient = useQueryClient()
     return useMutation<AddTaskResponse, AxiosError, AddTaskFormData>({
-        mutationFn: (data: AddTaskFormData) => createTask(data)
+        mutationFn: (data: AddTaskFormData) => createTask(data),
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries({ queryKey: ['tasks'] })
+        }
     })
 }

@@ -1,9 +1,22 @@
 import TaskCard from "./Task";
 import AddTask from "./AddTask";
 import { useTasks } from "../hooks/useTasks";
+import { socket } from "../socket";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function MainDashboard() {
-
+    useEffect(() => {
+        socket.connect()
+        function handleCreateTask(data: string) {
+            toast.info(data, { position: 'top-center', autoClose: 5000, theme: 'dark' })
+        }
+        socket.on("newTask", handleCreateTask)
+        return () => {
+            socket.off("newTask", handleCreateTask)
+            socket.disconnect()
+        }
+    }, [])
     const { data: tasks } = useTasks();
     console.log(tasks)
 

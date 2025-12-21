@@ -26,9 +26,15 @@ export interface AuthResponse {
 export interface PopulateUsers {
     message: string;
     count: number;
-    users: {
+    users: [{
         _id: string;
         username: string;
         email: string;
-    }
+    }]
+}
+
+export interface PopulateIndividualUser {
+    _id: string;
+    username: string;
+    email: string;
 }
