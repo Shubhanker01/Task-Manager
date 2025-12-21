@@ -9,6 +9,13 @@ A full‑stack collaborative task management application built as part of a full
 * **Frontend (Vercel):** https://task-manager-sable-six.vercel.app/
 * **Backend API (Render):** https://task-manager-x5t2.onrender.com
 ---
+Two Users are seeded in Database for testing purpose
+User1
+email: user1@gmail.com
+password: pass1
+User2
+email: user2@gmail.com
+password: pass2
 
 ## 🛠️ Tech Stack
 
